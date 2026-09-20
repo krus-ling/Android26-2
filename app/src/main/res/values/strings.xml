@@ -1,4 +1,44 @@
 <resources>
-    <string name="app_name">DroidPractice1</string>
-    <string name="article_title">Статья</string>
+    <string name="app_name">AndroidPractice</string>
+
+    <!-- Общая мета-информация статьи -->
+    <string name="article_paradox_title">Парадокс выбора: почему меньше вариантов делают нас счастливее</string>
+    <string name="article_paradox_intro">Вы когда-нибудь стояли перед полкой в супермаркете, не в силах выбрать один из 50 сортов йогурта, или часами прокручивали список фильмов на стриминге, так ничего и не посмотрев? Если да, то вы столкнулись с классическим «парадоксом выбора». Нам кажется, что больше вариантов — это свобода, но часто это приводит к тревоге и неудовлетворенности.</string>
+
+    <!-- Раздел 1: Проблема -->
+    <string name="article_paradox_problem_title">Проблема: Ловушка бесконечных возможностей</string>
+    <string name="article_paradox_problem_desc">Современный мир предлагает изобилие всего. Кажется, что чем шире выбор, тем легче удовлетворить свои потребности. Однако психолог Барри Шварц доказал обратное: переизбыток вариантов парализует.</string>
+
+    <!-- Пункты раздела 1 -->
+    <string name="article_paradox_problem_items_title">Что происходит в голове?</string>
+    <string name="article_paradox_problem_item_1">Усталость от принятия решений: когда вариантов слишком много, мы тратим ментальные силы на утомительное сравнение мелочей.</string>
+    <string name="article_paradox_problem_item_2">Сожаление об упущенном (FOMO): даже сделав выбор, мы сомневаемся: «А вдруг другой вариант был лучше?».</string>
+    <string name="article_paradox_problem_item_3">Снижение радости: стресс от сравнения перечеркивает удовольствие от самого результата покупки или решения.</string>
+
+    <!-- Раздел 2: Решение -->
+    <string name="article_paradox_solution_title">Решение: Культивирование удовлетворения</string>
+    <string name="article_paradox_solution_desc">Ограничение вариантов — это не потеря контроля, а освобождение ресурса внимания для действительно важных вещей.</string>
+
+    <!-- Пункты раздела 2 -->
+    <string name="article_paradox_solution_items_title">Что она делает правильно?</string>
+    <string name="article_paradox_solution_item_1">Стратегия satisficer: вместо поиска «абсолютного идеала» определите минимальные критерии качества и берите первый подходящий вариант.</string>
+    <string name="article_paradox_solution_item_2">Осознанные рамки: жестко сужая выбор в быту, вы экономите энергию для творчества, работы и отдыха.</string>
+
+    <!-- Раздел 3: Практика / Микро-рутина -->
+    <string name="article_paradox_steps_title">Как применить это в жизни?</string>
+    <string name="article_paradox_steps_desc">Меньше — действительно лучше, если это уменьшает фоновый стресс. Попробуйте три простых правила.</string>
+
+    <!-- Шаги -->
+    <string name="article_paradox_steps_items_title">Начните сегодня:</string>
+    <string name="article_paradox_steps_item_1">Создайте рутину: стандартизируйте завтраки по будням или соберите капсульный гардероб.</string>
+    <string name="article_paradox_steps_item_2">Доверяйте кураторам: выберите 1–2 проверенных источника рекомендаций вместо чтения сотен отзывов.</string>
+    <string name="article_paradox_steps_item_3">Правило 5 секунд: для несущественных решений давайте себе 5 секунд и соглашайтесь на первый достойный вариант.</string>
+
+    <!-- Нижний акцентный блок (Callout / Карточка задания) -->
+    <string name="article_paradox_callout_title">Попробуйте сегодня вечером</string>
+    <string name="article_paradox_callout_body">Выберите ровно три главные задачи на завтра и сфокусируйтесь только на них, убрав из поля зрения бесконечный список дел.</string>
+
+    <string name="textToShare">Привет! Почитай эти 2 статьи!</string>
+    <string name="textToShareTitle">Поделиться через</string>
+    <string name="ShareButtonText">Поделиться</string>
 </resources>
