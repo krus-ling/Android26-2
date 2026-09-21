@@ -118,7 +118,7 @@ fun ArticleImage() {
                 .clip(RoundedCornerShape(16.dp))
         )
         Text(
-            text = "Визуализация изобилия выбора",
+            text = stringResource(R.string.article_image_description),
             style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier
@@ -202,12 +202,14 @@ fun ArticleSectionCard(
  * @param articleId Уникальный идентификатор статьи для раздельного хранения лайков/дизлайков.
  * @param initialLikes Начальное количество лайков для этой статьи.
  * @param initialDislikes Начальное количество дизлайков для этой статьи.
+ * @param articleTitle Заголовок статьи для автоматической подстановки в текст поделиться.
  */
 @Composable
 fun ArticleActions(
     articleId: String = "article_1",
     initialLikes: Int = 10,
-    initialDislikes: Int = 0
+    initialDislikes: Int = 0,
+    articleTitle: String? = null
 ) {
     val context = LocalContext.current
     val prefs = remember(articleId) { context.getSharedPreferences("article_prefs_$articleId", Context.MODE_PRIVATE) }
@@ -269,7 +271,7 @@ fun ArticleActions(
                     reaction = Reaction.LIKE,
                     count = likes,
                     currentSelection = userSelection,
-                    contentDescription = "Лайк",
+                    contentDescription = stringResource(R.string.action_like),
                     onClick = { onReactionClick(it) }
                 )
 
@@ -287,16 +289,27 @@ fun ArticleActions(
                     reaction = Reaction.DISLIKE,
                     count = dislikes,
                     currentSelection = userSelection,
-                    contentDescription = "Дизлайк",
+                    contentDescription = stringResource(R.string.action_dislike),
                     onClick = { onReactionClick(it) },
                     modifier = Modifier.padding(end = 8.dp)
                 )
             }
 
+            // Формируем динамический текст сообщения (базовый текст + тема статьи)
+            val baseText = stringResource(R.string.textToShare)
+            val fullText = if (!articleTitle.isNullOrBlank()) {
+                "$baseText\n\n${stringResource(R.string.share_topic_prefix, articleTitle)}"
+            } else {
+                baseText
+            }
+
             // Настройка интента для "Поделиться"
             val sendIntent = Intent().apply {
                 action = Intent.ACTION_SEND
-                putExtra(Intent.EXTRA_TEXT, stringResource(R.string.textToShare))
+                putExtra(Intent.EXTRA_TEXT, fullText)
+                if (!articleTitle.isNullOrBlank()) {
+                    putExtra(Intent.EXTRA_SUBJECT, articleTitle)
+                }
                 type = "text/plain"
             }
             val shareIntent = Intent.createChooser(sendIntent, stringResource(R.string.textToShareTitle))

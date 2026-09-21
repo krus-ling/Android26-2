@@ -1,5 +1,6 @@
 package ru.urfu.droidpractice1.content
 
+import android.content.Intent
 import androidx.compose.animation.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -11,25 +12,23 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import ru.urfu.droidpractice1.SecondActivity
 import ru.urfu.droidpractice1.content.screens.ArticleComposeScreen
 import ru.urfu.droidpractice1.content.screens.MainDashboardScreen
 import ru.urfu.droidpractice1.ui.theme.DroidPractice1Theme
 
-/**
- * Перечисление доступных экранов приложения для управления навигацией.
- */
 enum class Screen {
-    Dashboard, // Главный экран со списком статей
-    ArticleCompose, // Экран статьи на Jetpack Compose
+    Dashboard,
+    ArticleCompose
 }
 
 @Composable
 fun MainActivityScreen() {
-    // Состояние текущего активного экрана (сохраняется при смене конфигурации)
     var currentScreen by rememberSaveable { mutableStateOf(Screen.Dashboard) }
+    val context = LocalContext.current
 
     DroidPractice1Theme {
-        // Оборачиваем в Box с фоном темы, чтобы при переходах не мелькал белый экран
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -38,7 +37,6 @@ fun MainActivityScreen() {
             AnimatedContent(
                 targetState = currentScreen,
                 transitionSpec = {
-                    // Плавная анимация: при входе в статью - вправо, при выходе в меню - влево
                     if (targetState != Screen.Dashboard) {
                         (slideInHorizontally { width -> width } + fadeIn()) togetherWith
                                 (slideOutHorizontally { width -> -width } + fadeOut())
@@ -54,7 +52,11 @@ fun MainActivityScreen() {
                         onNavigate = { currentScreen = it }
                     )
                     Screen.ArticleCompose -> ArticleComposeScreen(
-                        onBack = { currentScreen = Screen.Dashboard }
+                        onBack = { currentScreen = Screen.Dashboard },
+                        onOpenSecondArticle = {
+                            val intent = Intent(context, SecondActivity::class.java)
+                            context.startActivity(intent)
+                        }
                     )
                 }
             }

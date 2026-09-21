@@ -1,6 +1,7 @@
 package ru.urfu.droidpractice1.content.screens
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
@@ -20,6 +21,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.core.content.edit
 import ru.urfu.droidpractice1.R
 import ru.urfu.droidpractice1.SecondActivity
 import ru.urfu.droidpractice1.content.Screen
@@ -27,7 +29,7 @@ import ru.urfu.droidpractice1.content.components.ArticlePreviewCard
 
 /**
  * Главный экран приложения со списком доступных статей.
- *
+ * 
  * @param onNavigate Функция обратного вызова для перехода на выбранный экран.
  */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -35,8 +37,11 @@ import ru.urfu.droidpractice1.content.components.ArticlePreviewCard
 fun MainDashboardScreen(onNavigate: (Screen) -> Unit) {
     val context = LocalContext.current
     
-    // Состояние: прочитана ли вторая статья (сохраняется при повороте экрана)
-    var isXmlArticleRead by rememberSaveable { mutableStateOf(false) }
+    // Работа с SharedPreferences для хранения состояния "Прочитано" второй статьи
+    val prefs = remember { context.getSharedPreferences("article_prefs_article_2", Context.MODE_PRIVATE) }
+    
+    // Состояние: прочитана ли вторая статья (восстанавливается из SharedPreferences)
+    var isXmlArticleRead by rememberSaveable { mutableStateOf(prefs.getBoolean("key_is_read", false)) }
 
     // Лаунчер для запуска SecondActivity и получения результата назад
     val xmlArticleLauncher = rememberLauncherForActivityResult(
@@ -45,6 +50,7 @@ fun MainDashboardScreen(onNavigate: (Screen) -> Unit) {
         if (result.resultCode == Activity.RESULT_OK) {
             val isRead = result.data?.getBooleanExtra("is_read", false) ?: false
             isXmlArticleRead = isRead
+            prefs.edit { putBoolean("key_is_read", isRead) }
         }
     }
 
@@ -68,12 +74,13 @@ fun MainDashboardScreen(onNavigate: (Screen) -> Unit) {
         
         // Обработка системной кнопки Back для выхода из приложения
         var backPressedTime by remember { mutableLongStateOf(0L) }
+        val exitToastMessage = stringResource(R.string.toast_press_back_again_to_exit)
         BackHandler(enabled = true) {
             if (System.currentTimeMillis() - backPressedTime < 2000) {
                 (context as? Activity)?.finish()
             } else {
                 backPressedTime = System.currentTimeMillis()
-                Toast.makeText(context, "Нажмите еще раз для выхода", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, exitToastMessage, Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -86,7 +93,7 @@ fun MainDashboardScreen(onNavigate: (Screen) -> Unit) {
         ) {
             item {
                 Text(
-                    text = "Выберите статью",
+                    text = stringResource(R.string.dashboard_title),
                     style = MaterialTheme.typography.headlineSmall,
                     color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.Bold
@@ -104,25 +111,27 @@ fun MainDashboardScreen(onNavigate: (Screen) -> Unit) {
             }
 
             item {
-                // Превью второй статьи (XML)
+                // Превью второй статьи (XML - SecondActivity)
                 Box {
                     ArticlePreviewCard(
                         title = stringResource(id = R.string.article_habits_title),
                         description = stringResource(id = R.string.article_habits_intro),
-                        imageUrl = "https://developer.android.com/static/images/social/android-developers.png",
+                        imageUrl = "https://images.unsplash.com/photo-1506784983877-45594efa4cbe",
                         onClick = {
-                            val intent = Intent(context, SecondActivity::class.java)
+                            val intent = Intent(context, SecondActivity::class.java).apply {
+                                putExtra("is_read", isXmlArticleRead)
+                            }
                             xmlArticleLauncher.launch(intent)
                         }
                     )
                     
-                    // Если статья прочитана, показываем индикатор (зеленую галочку)
+                    // Если статья прочитана, показываем плашку "ПРОЧИТАНО"
                     if (isXmlArticleRead) {
                         Surface(
                             modifier = Modifier
                                 .align(Alignment.TopEnd)
                                 .padding(12.dp),
-                            color = Color.White.copy(alpha = 0.9f),
+                            color = Color.White.copy(alpha = 0.92f),
                             shape = MaterialTheme.shapes.small,
                             shadowElevation = 4.dp
                         ) {
@@ -133,12 +142,12 @@ fun MainDashboardScreen(onNavigate: (Screen) -> Unit) {
                                 Icon(
                                     imageVector = Icons.Default.CheckCircle,
                                     contentDescription = null,
-                                    tint = Color(0xFF2E7D32), // Темно-зеленый
+                                    tint = Color(0xFF2E7D32),
                                     modifier = Modifier.size(16.dp)
                                 )
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Text(
-                                    text = "ПРОЧИТАНО",
+                                    text = stringResource(R.string.read_badge),
                                     style = MaterialTheme.typography.labelSmall,
                                     fontWeight = FontWeight.Bold,
                                     color = Color(0xFF2E7D32)
