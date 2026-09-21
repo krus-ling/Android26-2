@@ -12,7 +12,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import ru.urfu.droidpractice1.content.screens.ArticleComposeScreen
-import ru.urfu.droidpractice1.content.screens.ArticleXmlPlaceholder
 import ru.urfu.droidpractice1.content.screens.MainDashboardScreen
 import ru.urfu.droidpractice1.ui.theme.DroidPractice1Theme
 
@@ -22,7 +21,6 @@ import ru.urfu.droidpractice1.ui.theme.DroidPractice1Theme
 enum class Screen {
     Dashboard, // Главный экран со списком статей
     ArticleCompose, // Экран статьи на Jetpack Compose
-    ArticleXml // Экран-заглушка для статьи на View XML
 }
 
 @Composable
@@ -56,9 +54,6 @@ fun MainActivityScreen() {
                         onNavigate = { currentScreen = it }
                     )
                     Screen.ArticleCompose -> ArticleComposeScreen(
-                        onBack = { currentScreen = Screen.Dashboard }
-                    )
-                    Screen.ArticleXml -> ArticleXmlPlaceholder(
                         onBack = { currentScreen = Screen.Dashboard }
                     )
                 }

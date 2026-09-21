@@ -1,4 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.DroidPractice1" parent="android:Theme.Material.Light.NoActionBar" />
+    <!-- Основная тема приложения, наследуется от Material3 -->
+    <style name="Theme.DroidPractice1" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Настройка основных цветов темы для XML -->
+        <item name="colorPrimary">@color/primary_light</item>
+        <item name="colorOnPrimary">@color/on_primary_light</item>
+        <item name="colorPrimaryContainer">@color/primary_container_light</item>
+        <item name="colorOnPrimaryContainer">@color/on_primary_container_light</item>
+        <item name="colorSecondary">@color/secondary_light</item>
+        <item name="colorSecondaryContainer">@color/secondary_container_light</item>
+        <item name="colorOnSecondaryContainer">@color/on_secondary_container_light</item>
+        <item name="android:windowBackground">@color/background_light</item>
+        <item name="colorSurface">@color/surface_light</item>
+        <item name="colorOnSurface">@color/on_surface_light</item>
+        <item name="colorSurfaceVariant">@color/surface_variant_light</item>
+        <item name="colorOnSurfaceVariant">@color/on_surface_variant_light</item>
+        <item name="navigationIconTint">?attr/colorOnSurface</item>
+    </style>
 </resources>

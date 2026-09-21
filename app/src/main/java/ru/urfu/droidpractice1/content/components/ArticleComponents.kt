@@ -36,7 +36,7 @@ import ru.urfu.droidpractice1.content.calculateReaction
 
 /**
  * Карточка превью статьи для главного экрана.
- * 
+ *
  * @param title Заголовок статьи.
  * @param description Краткое описание статьи.
  * @param imageUrl URL изображения для превью.
@@ -131,7 +131,7 @@ fun ArticleImage() {
 
 /**
  * Карточка раздела статьи (Проблема, Решение и т.д.).
- * 
+ *
  * @param title Заголовок раздела.
  * @param description Описание раздела.
  * @param titleItems Заголовок списка пунктов.
@@ -198,17 +198,25 @@ fun ArticleSectionCard(
 
 /**
  * Панель действий статьи: лайки, дизлайки и кнопка "Поделиться".
+ * 
+ * @param articleId Уникальный идентификатор статьи для раздельного хранения лайков/дизлайков.
+ * @param initialLikes Начальное количество лайков для этой статьи.
+ * @param initialDislikes Начальное количество дизлайков для этой статьи.
  */
 @Composable
-fun ArticleActions() {
+fun ArticleActions(
+    articleId: String = "article_1",
+    initialLikes: Int = 10,
+    initialDislikes: Int = 0
+) {
     val context = LocalContext.current
-    val prefs = remember { context.getSharedPreferences("article_prefs", Context.MODE_PRIVATE) }
+    val prefs = remember(articleId) { context.getSharedPreferences("article_prefs_$articleId", Context.MODE_PRIVATE) }
 
-    var likes by rememberSaveable { mutableIntStateOf(prefs.getInt("key_likes", 10)) }
-    var dislikes by rememberSaveable { mutableIntStateOf(prefs.getInt("key_dislikes", 0)) }
+    var likes by rememberSaveable(articleId) { mutableIntStateOf(prefs.getInt("key_likes", initialLikes)) }
+    var dislikes by rememberSaveable(articleId) { mutableIntStateOf(prefs.getInt("key_dislikes", initialDislikes)) }
     
     // Хранение выбора пользователя (Лайк/Дизлайк/Ничего)
-    var userSelection by rememberSaveable {
+    var userSelection by rememberSaveable(articleId) {
         val savedName = prefs.getString("key_selection", Reaction.NONE.name)
         val initialReaction = runCatching { Reaction.valueOf(savedName!!) }.getOrDefault(Reaction.NONE)
         mutableStateOf(initialReaction)
