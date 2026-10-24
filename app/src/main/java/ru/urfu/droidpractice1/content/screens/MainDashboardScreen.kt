@@ -1,19 +1,14 @@
 package ru.urfu.droidpractice1.content.screens
 
 import android.app.Activity
-import android.content.Context
-import android.content.Intent
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -21,38 +16,25 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.core.content.edit
 import ru.urfu.droidpractice1.R
-import ru.urfu.droidpractice1.SecondActivity
 import ru.urfu.droidpractice1.content.Screen
 import ru.urfu.droidpractice1.content.components.ArticlePreviewCard
 
 /**
  * Главный экран приложения со списком доступных статей.
  * 
+ * @param isXmlArticleRead Флаг прочтения второй статьи.
  * @param onNavigate Функция обратного вызова для перехода на выбранный экран.
+ * @param onOpenSecondArticle Функция открытия второй статьи (SecondActivity).
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainDashboardScreen(onNavigate: (Screen) -> Unit) {
+fun MainDashboardScreen(
+    isXmlArticleRead: Boolean,
+    onNavigate: (Screen) -> Unit,
+    onOpenSecondArticle: () -> Unit
+) {
     val context = LocalContext.current
-    
-    // Работа с SharedPreferences для хранения состояния "Прочитано" второй статьи
-    val prefs = remember { context.getSharedPreferences("article_prefs_article_2", Context.MODE_PRIVATE) }
-    
-    // Состояние: прочитана ли вторая статья (восстанавливается из SharedPreferences)
-    var isXmlArticleRead by rememberSaveable { mutableStateOf(prefs.getBoolean("key_is_read", false)) }
-
-    // Лаунчер для запуска SecondActivity и получения результата назад
-    val xmlArticleLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            val isRead = result.data?.getBooleanExtra("is_read", false) ?: false
-            isXmlArticleRead = isRead
-            prefs.edit { putBoolean("key_is_read", isRead) }
-        }
-    }
 
     Scaffold(
         topBar = {
@@ -105,7 +87,7 @@ fun MainDashboardScreen(onNavigate: (Screen) -> Unit) {
                 ArticlePreviewCard(
                     title = stringResource(id = R.string.article_paradox_title),
                     description = stringResource(id = R.string.article_paradox_intro),
-                    imageUrl = "https://hi-news.ru/wp-content/uploads/2024/09/shop_hacks_1-750x439.jpg.webp",
+                    imageUrl = stringResource(id = R.string.url_article_paradox_image),
                     onClick = { onNavigate(Screen.ArticleCompose) }
                 )
             }
@@ -116,13 +98,8 @@ fun MainDashboardScreen(onNavigate: (Screen) -> Unit) {
                     ArticlePreviewCard(
                         title = stringResource(id = R.string.article_habits_title),
                         description = stringResource(id = R.string.article_habits_intro),
-                        imageUrl = "https://images.unsplash.com/photo-1506784983877-45594efa4cbe",
-                        onClick = {
-                            val intent = Intent(context, SecondActivity::class.java).apply {
-                                putExtra("is_read", isXmlArticleRead)
-                            }
-                            xmlArticleLauncher.launch(intent)
-                        }
+                        imageUrl = stringResource(id = R.string.url_article_habits_image),
+                        onClick = onOpenSecondArticle
                     )
                     
                     // Если статья прочитана, показываем плашку "ПРОЧИТАНО"

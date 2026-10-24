@@ -1,6 +1,10 @@
 <resources>
     <string name="app_name">AndroidPractice</string>
 
+    <!-- Ссылки на изображения статей -->
+    <string name="url_article_paradox_image">https://hi-news.ru/wp-content/uploads/2024/09/shop_hacks_1-750x439.jpg.webp</string>
+    <string name="url_article_habits_image">https://images.unsplash.com/photo-1506784983877-45594efa4cbe</string>
+
     <!-- Навигация и системные сообщения -->
     <string name="dashboard_title">Выберите статью</string>
     <string name="back">Назад</string>

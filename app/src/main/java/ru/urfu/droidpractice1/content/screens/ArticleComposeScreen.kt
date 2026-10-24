@@ -1,6 +1,5 @@
 package ru.urfu.droidpractice1.content.screens
 
-import android.content.Context
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.*
 import androidx.compose.foundation.background
@@ -21,7 +20,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -35,12 +33,14 @@ import ru.urfu.droidpractice1.content.components.*
  * Экран с детальным описанием статьи, реализованный на Jetpack Compose.
  *
  * @param onBack Функция обратного вызова для возврата на предыдущий экран.
+ * @param isSecondArticleRead Флаг прочтения второй статьи.
  * @param onOpenSecondArticle Функция переключения на следующую статью.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ArticleComposeScreen(
     onBack: () -> Unit,
+    isSecondArticleRead: Boolean = false,
     onOpenSecondArticle: (() -> Unit)? = null
 ) {
     val listState = rememberLazyListState()
@@ -108,6 +108,7 @@ fun ArticleComposeScreen(
     ) { innerPadding ->
         ArticleContent(
             listState = listState,
+            isSecondArticleRead = isSecondArticleRead,
             onOpenSecondArticle = onOpenSecondArticle,
             modifier = Modifier.padding(innerPadding)
         )
@@ -120,6 +121,7 @@ fun ArticleComposeScreen(
 @Composable
 private fun ArticleContent(
     listState: LazyListState,
+    isSecondArticleRead: Boolean,
     onOpenSecondArticle: (() -> Unit)?,
     modifier: Modifier = Modifier
 ) {
@@ -207,15 +209,11 @@ private fun ArticleContent(
 
         if (onOpenSecondArticle != null) {
             item(key = "next_article") {
-                val context = LocalContext.current
-                val prefs = remember { context.getSharedPreferences("article_prefs_article_2", Context.MODE_PRIVATE) }
-                val isRead = prefs.getBoolean("key_is_read", false)
-
                 Box {
                     ElevatedCard(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .graphicsLayer { alpha = if (isRead) 0.65f else 1f }
+                            .graphicsLayer { alpha = if (isSecondArticleRead) 0.65f else 1f }
                             .clickable { onOpenSecondArticle() },
                         shape = RoundedCornerShape(16.dp)
                     ) {
@@ -249,7 +247,7 @@ private fun ArticleContent(
                         }
                     }
 
-                    if (isRead) {
+                    if (isSecondArticleRead) {
                         Surface(
                             modifier = Modifier
                                 .align(Alignment.TopEnd)

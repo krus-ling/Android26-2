@@ -1,6 +1,5 @@
 package ru.urfu.droidpractice1.content.components
 
-import android.content.Context
 import android.content.Intent
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
@@ -28,7 +27,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.core.content.edit
 import coil3.compose.AsyncImage
 import ru.urfu.droidpractice1.R
 import ru.urfu.droidpractice1.content.Reaction
@@ -106,9 +104,10 @@ fun ArticleIntro() {
 @Composable
 fun ArticleImage() {
     val isPreview = LocalInspectionMode.current
+    val imageUrl = stringResource(R.string.url_article_paradox_image)
     Column {
         AsyncImage(
-            model = if (isPreview) R.drawable.ic_launcher_background else "https://hi-news.ru/wp-content/uploads/2024/09/shop_hacks_1-750x439.jpg.webp",
+            model = if (isPreview) R.drawable.ic_launcher_background else imageUrl,
             contentDescription = null,
             contentScale = ContentScale.Crop,
             placeholder = painterResource(R.drawable.ic_launcher_background),
@@ -198,8 +197,9 @@ fun ArticleSectionCard(
 
 /**
  * Панель действий статьи: лайки, дизлайки и кнопка "Поделиться".
+ * Состояние переживает пересоздание через rememberSaveable.
  * 
- * @param articleId Уникальный идентификатор статьи для раздельного хранения лайков/дизлайков.
+ * @param articleId Уникальный идентификатор статьи.
  * @param initialLikes Начальное количество лайков для этой статьи.
  * @param initialDislikes Начальное количество дизлайков для этой статьи.
  * @param articleTitle Заголовок статьи для автоматической подстановки в текст поделиться.
@@ -212,17 +212,12 @@ fun ArticleActions(
     articleTitle: String? = null
 ) {
     val context = LocalContext.current
-    val prefs = remember(articleId) { context.getSharedPreferences("article_prefs_$articleId", Context.MODE_PRIVATE) }
 
-    var likes by rememberSaveable(articleId) { mutableIntStateOf(prefs.getInt("key_likes", initialLikes)) }
-    var dislikes by rememberSaveable(articleId) { mutableIntStateOf(prefs.getInt("key_dislikes", initialDislikes)) }
+    var likes by rememberSaveable(articleId) { mutableIntStateOf(initialLikes) }
+    var dislikes by rememberSaveable(articleId) { mutableIntStateOf(initialDislikes) }
     
     // Хранение выбора пользователя (Лайк/Дизлайк/Ничего)
-    var userSelection by rememberSaveable(articleId) {
-        val savedName = prefs.getString("key_selection", Reaction.NONE.name)
-        val initialReaction = runCatching { Reaction.valueOf(savedName!!) }.getOrDefault(Reaction.NONE)
-        mutableStateOf(initialReaction)
-    }
+    var userSelection by rememberSaveable(articleId) { mutableStateOf(Reaction.NONE) }
 
     // Обработка клика по кнопке реакции
     val onReactionClick: (Reaction) -> Unit = { target ->
@@ -235,13 +230,6 @@ fun ArticleActions(
         likes = result.likes
         dislikes = result.dislikes
         userSelection = result.selection
-
-        // Сохранение состояния
-        prefs.edit {
-            putInt("key_likes", result.likes)
-                .putInt("key_dislikes", result.dislikes)
-                .putString("key_selection", result.selection.name)
-        }
     }
 
     ElevatedCard(

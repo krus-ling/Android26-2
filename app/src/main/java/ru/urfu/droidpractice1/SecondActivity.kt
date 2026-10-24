@@ -6,7 +6,6 @@ import android.util.Log
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.edit
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import coil3.load
@@ -22,6 +21,11 @@ class SecondActivity : AppCompatActivity() {
     private val TAG = "SecondActivity"
 
     private val articleImageUrl = "https://images.unsplash.com/photo-1506784983877-45594efa4cbe"
+
+    companion object {
+        const val EXTRA_IS_READ = "is_read"
+        private const val KEY_IS_READ = "key_is_read"
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,28 +67,22 @@ class SecondActivity : AppCompatActivity() {
             }
         }
 
-        // 3. Логика переключателя "Прочитано" с сохранением и восстановлением состояния
-        val prefs = getSharedPreferences("article_prefs_article_2", MODE_PRIVATE)
-        val initialIsRead = intent.getBooleanExtra("is_read", prefs.getBoolean("key_is_read", false))
+        // 3. Восстановление состояния "Прочитано" из savedInstanceState или Intent
+        val initialIsRead = savedInstanceState?.getBoolean(KEY_IS_READ)
+            ?: intent.getBooleanExtra(EXTRA_IS_READ, false)
 
-        // Устанавливаем начальное состояние тумблера ДО подписки на слушатель,
-        // чтобы не вызывать Toast и событие при запуске экрана
+        // Устанавливаем состояние тумблера ДО подписки на слушатель
         binding.readSwitch.isChecked = initialIsRead
-        setResult(RESULT_OK, Intent().apply { putExtra("is_read", initialIsRead) })
+        setResult(RESULT_OK, Intent().apply { putExtra(EXTRA_IS_READ, initialIsRead) })
 
         binding.readSwitch.setOnCheckedChangeListener { _, isChecked ->
             val message = if (isChecked) getString(R.string.toast_article_marked_read) else getString(R.string.toast_article_marked_unread)
             Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
             Log.d(TAG, "Read switch changed: $isChecked")
-            
-            // Сохраняем состояние в SharedPreferences
-            prefs.edit {
-                putBoolean("key_is_read", isChecked)
-            }
 
-            // Передаем результат назад в MainActivity (пункт 6 задания)
+            // Передаем обновленное состояние назад в MainActivity
             val resultIntent = Intent().apply {
-                putExtra("is_read", isChecked)
+                putExtra(EXTRA_IS_READ, isChecked)
             }
             setResult(RESULT_OK, resultIntent)
         }
@@ -100,6 +98,12 @@ class SecondActivity : AppCompatActivity() {
                 )
             }
         }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        // Сохранение состояния при переворачивании экрана
+        outState.putBoolean(KEY_IS_READ, binding.readSwitch.isChecked)
     }
 
     override fun onStart() {

@@ -1,6 +1,9 @@
 package ru.urfu.droidpractice1.content
 
+import android.app.Activity
 import android.content.Intent
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -26,7 +29,25 @@ enum class Screen {
 @Composable
 fun MainActivityScreen() {
     var currentScreen by rememberSaveable { mutableStateOf(Screen.Dashboard) }
+    var isXmlArticleRead by rememberSaveable { mutableStateOf(false) }
     val context = LocalContext.current
+
+    // Лаунчер для запуска SecondActivity и получения результата отметки "Прочитано"
+    val xmlArticleLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val isRead = result.data?.getBooleanExtra(SecondActivity.EXTRA_IS_READ, false) ?: false
+            isXmlArticleRead = isRead
+        }
+    }
+
+    val onOpenSecondArticle = {
+        val intent = Intent(context, SecondActivity::class.java).apply {
+            putExtra(SecondActivity.EXTRA_IS_READ, isXmlArticleRead)
+        }
+        xmlArticleLauncher.launch(intent)
+    }
 
     DroidPractice1Theme {
         Box(
@@ -49,23 +70,17 @@ fun MainActivityScreen() {
             ) { screen ->
                 when (screen) {
                     Screen.Dashboard -> MainDashboardScreen(
-                        onNavigate = { currentScreen = it }
+                        isXmlArticleRead = isXmlArticleRead,
+                        onNavigate = { currentScreen = it },
+                        onOpenSecondArticle = onOpenSecondArticle
                     )
                     Screen.ArticleCompose -> ArticleComposeScreen(
+                        isSecondArticleRead = isXmlArticleRead,
                         onBack = { currentScreen = Screen.Dashboard },
-                        onOpenSecondArticle = {
-                            val intent = Intent(context, SecondActivity::class.java)
-                            context.startActivity(intent)
-                        }
+                        onOpenSecondArticle = onOpenSecondArticle
                     )
                 }
             }
         }
     }
 }
-
-//@Preview(showBackground = true)
-//@Composable
-//fun MainScreenPreview() {
-//    MainActivityScreen()
-//}
